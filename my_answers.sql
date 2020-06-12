@@ -150,6 +150,8 @@ CREATE TABLE products (
 CREATE TABLE orders (
     orderId SERIAL PRIMARY KEY,
     productId INTEGER REFERENCES products(productId),
+    userId INTEGER REFERENCES users(userId),
+    quantity INTEGER
 )
 
 -- Add users
@@ -167,69 +169,58 @@ VALUES
 INSERT INTO users
 (name, email)
 VALUES
-('Simba', 'theontrueking98@gmail.com');
+('Simba', 'theonetrueking98@gmail.com');
 
 -- Add products
 
 INSERT INTO products
 (name, price)
 VALUES
-('Avocado', '0.50');
+('Avocado', 0.50);
 
 INSERT INTO products
 (name, price)
 VALUES
-('Watermelon', '3.50');
+('Watermelon', 3.50);
 
 INSERT INTO products
 (name, price)
 VALUES
-('Jackfruit', '20.99');
+('Jackfruit', 20.99);
 
 -- Add orders
 
 INSERT INTO orders
-(productId)
+(productId, quantity, userId)
 VALUES
-(1);
+(1, 50, 1);
 
 INSERT INTO orders
-(productId)
+(productId, quantity, userId)
 VALUES
-(2);
+(2, 15, 2);
 
 INSERT INTO orders
-(productId)
+(productId, quantity, userId)
 VALUES
-(3);
+(3, 20, 3);
 
 -- Run queries
 
-SELECT * FROM orders
-WHERE orderId = 1;
+SELECT * FROM orders o
+WHERE o.orderId = 1;
 
 SELECT * FROM orders;
 
-SELECT *
-FROM orders
-WHERE productId IN (SELECT SUM(price) FROM products);
+SELECT o.orderId, sum(products.price * o.quantity) FROM orders o
+WHERE o.orderId = 1;
 
-ALTER TABLE orders
-ADD userId INTEGER REFERENCES users(userId);
+SELECT * FROM users u
+JOIN order o ON o.userId = u.userId
+WHERE u.userId = 1
+GROUP BY u.userId, o.orderId;
 
-UPDATE orders
-SET userId = 1
-WHERE orderId = 1;
-
-UPDATE orders
-SET userId = 2
-WHERE orderId = 2;
-
-UPDATE orders
-SET userId = 3;
-WHERE orderId = 3;
-
-SELECT * 
-FROM orders
-WHERE userId = 1;
-
+SELECT * FROM u.name, count(o.orderId) AS totalOrders
+FROM users u
+JOIN orders o ON o.userId = u.userId
+GROUP BY u.userId;
